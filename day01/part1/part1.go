@@ -8,22 +8,6 @@ import (
     "strings"
 )
 
-/*
--------------------
-read file as string 
--------------------
-bytes, err := os.ReadFile(name)
-str := string(bytes)
-
------------------------
-read file line by line 
------------------------
-readFile, err := os.Open(name)
-fileScanner := bufio.NewScanner(readFile)
-for fileScanner.Scan() {}
-*/
-
-
 func max(num1 int, num2 int) int {
     if num1 >= num2 {
         return num1 
@@ -61,13 +45,5 @@ func main() {
         panic(err)
     }
     str := string(bytes)
-
-    /*
-    readFile, err := os.Open("input.txt")
-    if err != nil {
-        panic(err)
-    }
-    fileScanner := bufio.NewScanner(readFile)
-    */
     fmt.Println(compute(str))
 }

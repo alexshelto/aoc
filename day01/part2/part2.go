@@ -9,7 +9,6 @@ import (
     "sort"
 )
 
-
 func compute(input string) int {
     scanner := bufio.NewScanner(strings.NewReader(input))
 
@@ -20,15 +19,7 @@ func compute(input string) int {
         line := scanner.Text()
         // If we hit newline new group 
         if len(line) == 0 {
-
-
-            // smallest item in set swapped 
-            // calorie X
-            // calorie y
-            // calorie X
             calorie_sums = append(calorie_sums, local_sum)
-
-
             local_sum = 0
         } else {
             calories, err := strconv.Atoi(line)

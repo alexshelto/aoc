@@ -34,5 +34,6 @@ func main() {
         panic(err)
     }
     input := string(bytes)
+
     fmt.Println(compute(input))
 }
