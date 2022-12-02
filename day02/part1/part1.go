@@ -7,18 +7,12 @@ import (
     "strings"
 )
 
-var loosesTo = map[string]string{"A":"Y", "B":"Z", "C": "X"}
-var tiesTo = map[string]string{"A":"X", "B":"Y", "C": "Z"}
-
-func calcMoveScore(throw string) int {
-    if throw == "X" {
-        return 1
-    } else if throw == "Y" {
-        return 2
-    } else {
-        return 3
-    }
-}
+var remap = map[string]string{"A":"R", "B":"P", "C":"S",
+                              "X":"R", "Y":"P", "Z":"S",
+                             }
+var winsTo = map[string]string{"R":"S", "S":"P", "P":"R"}
+var loosesTo = map[string]string{"R":"P", "P":"S", "S": "R"}
+var scoreTable = map[string]int{"R":1, "P":2, "S":3}
 
 
 func compute(input string) int {
@@ -26,18 +20,16 @@ func compute(input string) int {
     ret := 0
 
     for scanner.Scan() {
-        line := scanner.Text()
-        moves := strings.Split(line, " ")
-
-        theirHand := moves[0]
-        myHand := moves[1]
+        moves := strings.Split(scanner.Text(), " ")
+        theirHand := remap[moves[0]]
+        myHand := remap[moves[1]]
 
         if loosesTo[theirHand] == myHand {
-            ret += calcMoveScore(myHand) + 6
-        } else if tiesTo[theirHand] == myHand {
-            ret += calcMoveScore(myHand) + 3
+            ret += scoreTable[myHand] + 6
+        } else if theirHand == myHand {
+            ret += scoreTable[myHand] + 3
         } else {
-            ret += calcMoveScore(myHand)
+            ret += scoreTable[myHand]
         }
     }
     return ret
