@@ -28,7 +28,7 @@ func NewAssignment(r string) Assignment {
 }
 
 
-func RangeEncapsulates(a1 *Assignment, a2 *Assignment) bool {
+func RangeEncapsulatesPartial(a1 *Assignment, a2 *Assignment) bool {
     if a2.low >= a1.low && a2.low <= a1.high || 
         a1.low >= a2.low && a1.low <= a2.high {
             return true
