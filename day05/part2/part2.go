@@ -29,9 +29,14 @@ type Stack struct {
 }
 
 
-func (s *Stack) Push(v string) {
+func (s *Stack) Prepend(v string) {
     s.contents = append([]string{v}, s.contents...)
 }
+
+func (s *Stack) Push(v string) {
+    s.contents = append(s.contents, v)
+}
+
 
 // make pop
 func (s *Stack) Pop() (string, error) {
@@ -62,7 +67,7 @@ func New(vec []string) CraneYard {
         for i, c := range line {
             if unicode.IsLetter(c) {
                 stackNo := (int(vec[n_lines-1][i]) - '0')
-                cy.stacks[stackNo].Push(string(c))
+                cy.stacks[stackNo].Prepend(string(c))
             }
         }
     }
@@ -76,7 +81,6 @@ func compute(input string) string {
     moves := strings.Split(lines[1], "\n")
 
     cy := New(setupChunk)
-    fmt.Println(cy)
 
     re := regexp.MustCompile("([0-9]+)") 
 
@@ -97,17 +101,16 @@ func compute(input string) string {
             if err != nil {
                 panic("")
             }
-            tmp_stack.contents = append(tmp_stack.contents, val)
+            tmp_stack.Push(val)
         }
 
         for i := 0; i < count; i++ {
             val, err := tmp_stack.Pop()
             if err == nil {
-                cy.stacks[to].contents = append(cy.stacks[to].contents, val)
+                cy.stacks[to].Push(val)
             }
         }
     }
-
 
     ret := "" 
 
@@ -120,8 +123,6 @@ func compute(input string) string {
 
     return ret
 }
-
-
 
 func main() {
     bytes, err := os.ReadFile("../input.txt")
