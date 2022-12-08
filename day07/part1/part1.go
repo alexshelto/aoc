@@ -3,68 +3,68 @@ package main
 import (
 	"fmt"
 	"os"
-    "strings"
-    "strconv"
+	"strconv"
+	"strings"
 )
 
-var MAX_SIZE_SUM = 100000
-
-
-type DirectoryChildren map[string][]string 
-func (dc *DirectoryChildren) AddDescendent(path string, dir string) {
-    if _, ok := (*dc)[path]; ok {
-        (*dc)[path] = append((*dc)[path], dir)
-    } else {
-        (*dc)[path] = []string{dir}
-    }
-}
-
-
-type DirectorySizeTable map[string]int
-
-func (dst *DirectorySizeTable) IncrementBy(path string, size int) {
-    if val, ok := (*dst)[path]; ok {
-        (*dst)[path] = val + size
-    } else {
-        (*dst)[path] = val
-    }
-}
-
-
-
+var MAX_DIR_SIZE = 100000
 
 type PathStack struct {
     paths []string 
 }
 
-func (p *PathStack) Push(fp string) {
-    p.paths = append(p.paths, fp)
-
-    fmt.Println("Pushed to stack")
+func (ps *PathStack) ChangeDir(path string) {
+    if path == ".." {
+        ps.Pop()
+    } else {
+        ps.Push(path)
+    }
 }
 
-func (p *PathStack) Pop() string {
-    length := len(p.paths)
+func (ps *PathStack) Push(path string) {
+    ps.paths = append(ps.paths, path)
+}
+
+func (ps *PathStack) CurrentPath() string {
+    length := len(ps.paths)
 
     if length < 1 {
-        panic("Empty stack, this is wrong")
+        panic("Blew up in curentPath() something went wrong parsing")
     }
+    val := ps.paths[length - 1]
+    return val
+}
 
-    val := p.paths[length-1]
-    p.paths = p.paths[0:length-1] 
+func (ps *PathStack) Pop() string {
+    length := len(ps.paths)
+
+    if length < 1 {
+        panic("Blew up in Pop(), something went wrong parsing")
+    }
+    val := ps.paths[length - 1]
+    ps.paths = ps.paths[0:length-1]
 
     return val
 }
 
-func (p * PathStack) CurrentPath() string {
-    length := len(p.paths)
+type DirectoryTable map[string][]string
 
-    if length < 1 {
-        panic("Empty stack, this is wrong")
+func (dt *DirectoryTable) AddTo(dirName string, path string) {
+    if _, ok := (*dt)[path]; ok {
+        (*dt)[path] = append((*dt)[path], dirName) 
+    } else {
+        (*dt)[path] = []string{dirName}
     }
+}
 
-    val := p.paths[length-1]
-    return val
+type DirSize map[string]int
+
+func (ds *DirSize) AddTo(size int, path string) {
+    if current, ok := (*ds)[path]; ok {
+        (*ds)[path] = current + size 
+    } else {
+        (*ds)[path] = size 
+    }
 }
 
 
@@ -72,52 +72,52 @@ func (p * PathStack) CurrentPath() string {
 func compute(input string) int {
     lines := strings.Split(input, "\n")
 
+    dirTable := DirectoryTable{}
     pathStack := PathStack{}
-    dirChildren := DirectoryChildren{}
-    sizeTable := DirectorySizeTable{}
+    dirSizes := DirSize{}
 
     for _, line := range lines {
+        wds := strings.Split(line, " ")
 
         if line[0] == '$' {
-            listingOutput = false
-        }
-
-
-        if listingOutput {
-            wds := strings.Split(line, " ")
+            fmt.Println("command:", line)
+            if wds[1] == "cd" {
+                pathStack.ChangeDir(wds[2])
+            } else {
+            }
+        } else {
+            fmt.Println("output:", line)
             if wds[0] == "dir" {
-                dirChildren.AddDescendent(pathStack.CurrentPath(), wds[1])
+                dirTable.AddTo(wds[1], pathStack.CurrentPath())
             } else {
-                size, err := strconv.Atoi(wds[0])
-                if err != nil {
-                    panic("Parsed wrong")
-                }
-                sizeTable.IncrementBy(pathStack.CurrentPath(), size)
+                val, _ := strconv.Atoi(wds[0])
+                fmt.Println(val)
+                dirSizes.AddTo(val, pathStack.CurrentPath())
             }
         }
-        if line[0] == '$' {
-            listingOutput = false
-            if line == "$ ls" {
-                listingOutput = true
-            } else {
-                wds := strings.Split(line, " ") 
-                if wds[1] == ".." {
-                    pathStack.Pop()
-                } else {
-                    pathStack.Push(wds[2])
-                }
-            }
-        }
-
-
-        fmt.Println("input:", line, " | stack:", pathStack.paths, " sizes:", sizeTable)
-
     }
 
-    fmt.Println(sizeTable)
-    fmt.Println(dirChildren)
+    /*
+        map[/:23352670 a:94269 d:24933642 e:584]
+        map[/:[a d] a:[e]]
+    */
 
-    return 0
+    ret := 0
+
+    for dir, nestedDirs := range dirTable {
+        fmt.Println("Dir:", dir, "Contains dirs:", nestedDirs)
+        val, _ := dirSizes[dir]
+        tmp := val
+        for _, nestedDir := range nestedDirs {
+            tmp += dirSizes[nestedDir]
+        }
+
+        if tmp <= MAX_DIR_SIZE {
+            ret += tmp
+        }
+    }
+
+    return ret
 }
 
 func main() {
