@@ -27,10 +27,6 @@ func compute(input string) int {
 
     matrix := utils.BuildDigitMatrix(lines)
 
-
-    // going left
-    //fmt.Println(matrix[2][:2])
-
     n := len(matrix)
     m := len(matrix[0])
 
@@ -38,7 +34,6 @@ func compute(input string) int {
     for i := 0; i < n; i++ {
         for j := 0; j < m; j++ {
             val := matrix[i][j]
-
             // L
             if j == 0 || Max(matrix[i][:j]) < val {
                 ret += 1
