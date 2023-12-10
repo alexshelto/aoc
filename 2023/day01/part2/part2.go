@@ -26,7 +26,7 @@ type Entry struct {
 	value    string
 }
 
-func NewSpelledOutNumber(position int, value string) Entry {
+func NewEntry(position int, value string) Entry {
 	return Entry{
 		position,
 		value,
@@ -44,18 +44,18 @@ func firstAndLastNumber(line string) string {
 
 		if idx_first != -1 {
 			numberStrings =
-				append(numberStrings, NewSpelledOutNumber(idx_first, value))
+				append(numberStrings, NewEntry(idx_first, value))
 		}
         if idx_last != -1 && idx_last != idx_first {
 			numberStrings =
-				append(numberStrings, NewSpelledOutNumber(idx_last, value))
+				append(numberStrings, NewEntry(idx_last, value))
         }
 	}
 
     // populate list with char numbers
     for idx, c := range line {
         if unicode.IsDigit(c) {
-            numberStrings = append(numberStrings, NewSpelledOutNumber(idx, string(c)))
+            numberStrings = append(numberStrings, NewEntry(idx, string(c)))
         }
     }
 
